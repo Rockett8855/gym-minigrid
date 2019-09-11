@@ -2,6 +2,7 @@
 
 from __future__ import division, print_function
 
+import numpy as np
 import sys
 import numpy
 import gym
@@ -17,12 +18,12 @@ def main():
         "--env-name",
         dest="env_name",
         help="gym environment to load",
-        default='MiniGrid-MultiRoom-N6-v0'
+        default='MiniGrid-Pusher8-Block40-Env20x20-v0'
     )
     (options, args) = parser.parse_args()
 
     # Load the gym environment
-    env = gym.make(options.env_name)
+    env = gym.make(options.env_name, seed=123)
 
     def resetEnv():
         env.reset()
@@ -34,7 +35,16 @@ def main():
     # Create a window to render into
     renderer = env.render('human')
 
+    global ACTIONS
+    global AGENT_IDX
+
+    ACTIONS = [env.actions.none] * env.n_agents
+    AGENT_IDX = 0
+
     def keyDownCb(keyName):
+        global ACTIONS
+        global AGENT_IDX
+
         if keyName == 'BACKSPACE':
             resetEnv()
             return
@@ -50,24 +60,25 @@ def main():
             action = env.actions.right
         elif keyName == 'UP':
             action = env.actions.forward
-
-        elif keyName == 'SPACE':
-            action = env.actions.toggle
-        elif keyName == 'PAGE_UP':
-            action = env.actions.pickup
-        elif keyName == 'PAGE_DOWN':
-            action = env.actions.drop
+        elif keyName == 'DOWN':
+            action = env.actions.backward
 
         elif keyName == 'RETURN':
-            action = env.actions.done
+            action = env.actions.none
+        elif keyName == 'SPACE':
+            ACTIONS[AGENT_IDX] = env.actions.none
+            AGENT_IDX = (AGENT_IDX + 1) % env.n_agents
+            action = env.actions.none
 
         else:
             print("unknown key %s" % keyName)
             return
 
-        obs, reward, done, info = env.step(action)
+        ACTIONS[AGENT_IDX] = action
 
-        print('step=%s, reward=%.2f' % (env.step_count, reward))
+        obs, reward, done, info = env.step(ACTIONS)
+
+        print(f'step={env.step_count}, reward={reward}')
 
         if done:
             print('done!')

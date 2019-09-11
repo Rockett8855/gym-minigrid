@@ -13,9 +13,18 @@ COLORS = {
     'red'   : np.array([255, 0, 0]),
     'green' : np.array([0, 255, 0]),
     'blue'  : np.array([0, 0, 255]),
-    'purple': np.array([112, 39, 195]),
-    'yellow': np.array([255, 255, 0]),
-    'grey'  : np.array([100, 100, 100])
+    'old_purple': np.array([112, 39, 195]),
+    'old_yellow': np.array([255, 255, 0]),
+    'grey'  : np.array([100, 100, 100]),
+
+# outrun
+    'purple': np.array([92, 38, 134]),
+    'dark_purple': np.array([28, 6, 88]),
+    'whiteish': np.array([244, 245, 251]),
+    'teal': np.array([54, 205, 196]),
+    'light_purple': np.array([152, 118, 178]),
+    'pink': np.array([255, 22, 144]),
+    'yellow': np.array([244, 214, 118]),
 }
 
 COLOR_NAMES = sorted(list(COLORS.keys()))
@@ -25,9 +34,17 @@ COLOR_TO_IDX = {
     'red'   : 0,
     'green' : 1,
     'blue'  : 2,
-    'purple': 3,
-    'yellow': 4,
-    'grey'  : 5
+    'old_purple': 3,
+    'old_yellow': 4,
+    'grey'  : 5,
+
+# outrun
+    'purple': 6,
+    'dark_purple': 7,
+    'whiteish': 8,
+    'teal': 9,
+    'pink': 10,
+    'yellow': 11,
 }
 
 IDX_TO_COLOR = dict(zip(COLOR_TO_IDX.values(), COLOR_TO_IDX.keys()))
@@ -130,7 +147,7 @@ class Floor(WorldObj):
     Colored floor tile the agent can walk over
     """
 
-    def __init__(self, color='blue'):
+    def __init__(self, color='whiteish'):
         super().__init__('floor', color)
 
     def can_overlap(self):
@@ -194,7 +211,7 @@ class Lava(WorldObj):
         ])
 
 class Wall(WorldObj):
-    def __init__(self, color='grey'):
+    def __init__(self, color='dark_purple'):
         super().__init__('wall', color)
 
     def see_behind(self):
@@ -322,18 +339,18 @@ class Ball(WorldObj):
         r.drawCircle(CELL_PIXELS * 0.5, CELL_PIXELS * 0.5, 10)
 
 class Box(WorldObj):
-    def __init__(self, color, contains=None):
+    def __init__(self, color='yellow', contains=None):
         super(Box, self).__init__('box', color)
         self.contains = contains
 
     def can_pickup(self):
-        return True
+        return False
 
     def render(self, r):
         c = COLORS[self.color]
         r.setLineColor(c[0], c[1], c[2])
-        r.setColor(0, 0, 0)
-        r.setLineWidth(2)
+        r.setColor(*COLORS['dark_purple'])
+        r.setLineWidth(1)
 
         r.drawPolygon([
             (4            , CELL_PIXELS-4),
@@ -344,9 +361,16 @@ class Box(WorldObj):
 
         r.drawLine(
             4,
-            CELL_PIXELS / 2,
+            4,
             CELL_PIXELS - 4,
-            CELL_PIXELS / 2
+            CELL_PIXELS - 4
+        )
+
+        r.drawLine(
+            CELL_PIXELS - 4,
+            4,
+            4,
+            CELL_PIXELS - 4
         )
 
         r.setLineWidth(1)
@@ -481,17 +505,19 @@ class Grid:
         # use the renderer to scale back to the desired size
         r.scale(tile_size / CELL_PIXELS, tile_size / CELL_PIXELS)
 
+        bg = COLORS['light_purple']
+
         # Draw the background of the in-world cells black
         r.fillRect(
             0,
             0,
             widthPx,
             heightPx,
-            0, 0, 0
+            bg[0], bg[1], bg[2]
         )
 
         # Draw grid lines
-        r.setLineColor(100, 100, 100)
+        r.setLineColor(*COLORS['teal'])
         for rowIdx in range(0, self.height):
             y = CELL_PIXELS * rowIdx
             r.drawLine(0, y, widthPx, y)
@@ -1326,7 +1352,7 @@ class MiniGridEnv(gym.Env):
                         abs_j * CELL_PIXELS,
                         CELL_PIXELS,
                         CELL_PIXELS,
-                        255, 255, 255, 75
+                        255, 255, 255, 10
                     )
 
         r.endFrame()
