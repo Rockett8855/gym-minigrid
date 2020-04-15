@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 numpy = "*"
+networkx = "*"
+numpy-indexed = "*"
+gym-minigrid = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"

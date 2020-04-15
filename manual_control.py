@@ -52,7 +52,7 @@ def main():
         if keyName == 'ESCAPE':
             sys.exit(0)
 
-        action = 0
+        action = env.actions.none
 
         if keyName == 'LEFT':
             action = env.actions.left
@@ -64,7 +64,10 @@ def main():
             action = env.actions.backward
 
         elif keyName == 'RETURN':
-            action = env.actions.none
+            for _ in range(env.n_agents):
+                env.game.unstep()
+            return
+            # action = env.actions.none
         elif keyName == 'SPACE':
             ACTIONS[AGENT_IDX] = env.actions.none
             AGENT_IDX = (AGENT_IDX + 1) % env.n_agents

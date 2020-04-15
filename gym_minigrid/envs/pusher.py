@@ -2,6 +2,7 @@ import numpy as np
 
 from gym_minigrid.minigrid import OBJECT_TO_IDX, Box, Grid
 from gym_minigrid.pushergrid import PusherGridEnv
+from gym_minigrid.pushergame import PusherGame
 from gym_minigrid.register import register
 
 
@@ -10,51 +11,12 @@ class PusherEnv(PusherGridEnv):
         self.n_agents = n_agents
         self.n_blocks = n_blocks
 
-        self.block_top = (2, 2)
-        self.block_size = (size - 4, size - 4)
-
         super().__init__(
             n_agents,
             grid_size=size,
             max_steps=10 * size * size,
             **kwargs
         )
-
-    def _place_agent_left(self, idx, color):
-        top = (1, 1)
-        size = (1, self.height-2)
-        self.place_agent(idx, top=top, size=size, direction=0, color=color)
-
-    def _place_agent_top(self, idx, color):
-        top = (1, 1)
-        size = (self.width-2, 1)
-        self.place_agent(idx, top=top, size=size, direction=1, color=color)
-
-    def _place_agent_right(self, idx, color):
-        top = (self.width-2, 1)
-        size = (1, self.height-2)
-        self.place_agent(idx, top=top, size=size, direction=2, color=color)
-
-    def _place_agent_bottom(self, idx, color):
-        top = (1, self.height-2)
-        size = (self.width-2, 1)
-        self.place_agent(idx, top=top, size=size, direction=3, color=color)
-
-    def _init_agent(self, idx, pos, color):
-        """
-        Puts an agent down, pos = 0(left column), 1(top row), 2(right column), 3(bottom row)
-        pointing in the direction towards the center
-        """
-        if pos == 0:
-            self._place_agent_left(idx, color)
-        elif pos == 1:
-            self._place_agent_top(idx, color)
-        elif pos == 2:
-            self._place_agent_right(idx, color)
-        elif pos == 3:
-            self._place_agent_bottom(idx, color)
-        else:
-            assert False, "unkown position"
 
     def _done(self):
         """
@@ -66,29 +28,20 @@ class PusherEnv(PusherGridEnv):
         # print(np.array_equal(block_idx, self.goal_block_idx))
         return np.array_equal(block_idx, self.goal_block_idx)
 
-    def _reward(self, agent_i):
+    def _reward(self):
         """
         Returns a reward for a spefic agent
         """
         return 0
 
-    def _gen_grid(self, width, height):
-        self.grid = Grid(width, height)
+    def make_game(self, n_agents, n_blocks, width, height):
+        self.game = PusherGame(n_blocks, n_agents, width, height, self._rand_int)
+        self.game.random_game()
 
-        self.grid.wall_rect(0, 0, width, height)
+        goal = PusherGame(n_blocks, n_agents, width, height, self._rand_int)
+        goal.random_game()
 
-        # place agents on the outskirts
-        for i in range(self.n_agents):
-            self._init_agent(i, i % 4, self._rand_color())
-
-        # place blocks in the center area
-        goal_grid = Grid(width, height)
-
-        for i in range(self.n_blocks):
-            self.place_obj(Box(), top=self.block_top, size=self.block_size, grid=goal_grid)
-            self.place_obj(Box(), top=self.block_top, size=self.block_size, grid=self.grid)
-
-        self.goal_grid_np = goal_grid.encode()
+        self.goal_grid_np = goal.grid.encode()
         self.goal_block_idx = self.goal_grid_np == OBJECT_TO_IDX['box']
 
 
