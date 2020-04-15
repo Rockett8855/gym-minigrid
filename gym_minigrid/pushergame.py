@@ -166,7 +166,7 @@ class PusherGame(object):
         self.grid.set(from_pos[0], from_pos[1], None)
         unstep['blocks'].append((from_pos, to_pos, cell))
 
-    def try_push_block(self, block_pos, block_cell, direction):
+    def try_push_block(self, block_pos, block_cell, direction, unstep):
         next_pos = block_pos + direction
         next_cell = self.grid.get(*next_pos)
 
@@ -174,27 +174,27 @@ class PusherGame(object):
             return False
 
         if type(next_cell) is Box:
-            if self.try_push_block(next_pos, next_cell, direction):
-                self.move_block(block_pos, next_pos, block_cell)
+            if self.try_push_block(next_pos, next_cell, direction, unstep):
+                self.move_block(block_pos, next_pos, block_cell, unstep)
                 return True
         elif next_cell is None or next_cell.can_overlap():
-            self.move_block(block_pos, next_pos, block_cell)
+            self.move_block(block_pos, next_pos, block_cell, unstep)
             return True
         else:
             return False
 
-    def try_move_and_push_fwd(self, agent, pos, unstep):
+    def try_move_and_push_fwd(self, agent_idx, agent, pos, unstep):
         cell = self.grid.get(*pos)
 
         if type(cell) is Box:
             # try and push the block one unit in the "forward" direction
-            if not self.try_push_block(pos, cell, agent.dir_vec):
+            if not self.try_push_block(pos, cell, agent.dir_vec, unstep):
                 # Couldn't move the blocks
                 return False
             # The blocks get removed in reverse order, we want to undo in the
             # opposite order of movement.
             unstep["blocks"].reverse()
-        return self.try_move_to(pos)
+        return self.try_move_to(agent_idx, agent, pos, unstep)
 
     def try_move_to(self, agent_idx, agent, pos, unstep):
         cell = self.grid.get(*pos)
@@ -214,7 +214,7 @@ class PusherGame(object):
         # Move forward
         if action == self.actions.forward:
             fwd_pos = agent.front_pos
-            self.try_move_and_push_fwd(agent, fwd_pos, unstep)
+            self.try_move_and_push_fwd(agent_idx, agent, fwd_pos, unstep)
         # Move backward
         elif action == self.actions.backward:
             back_pos = agent.back_pos
