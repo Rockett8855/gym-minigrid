@@ -1,5 +1,17 @@
 # Minimalistic Gridworld Environment (MiniGrid)
 
+## Matthew Rockett's Additions
+
+I've added
+- the ability to use multiple agents, instead of a single one interacting with the environment. The action space is now the cartesian product of the action space of each of agents.
+- a pusher gridworld environment. This allows the agent to manipulate "blocks" in the world by pushing them. This can be seen in `gym_minigrid/pushergrid.py` and `gym_minigrid/pushergame.py`. The current gridworlds are defined in `gym_minigrid/envs/pusher.py`. You should note that the agents can only pushe with the broadside, not the pointy side.
+- a random actions (`random_actions.py`) script where you can see all the agents independently selecting random actions. The `manual_control.py` script allows you to use the arrow keys to navigate individual agents. Use the spacebar to toggle between agents.
+
+The `manual_control.py` and `random_actions.py` should give a pretty good outline for how to interact with the environment.
+
+
+## Original README
+
 [![Build Status](https://travis-ci.org/maximecb/gym-minigrid.svg?branch=master)](https://travis-ci.org/maximecb/gym-minigrid)
 
 There are other gridworld Gym environments out there, but this one is

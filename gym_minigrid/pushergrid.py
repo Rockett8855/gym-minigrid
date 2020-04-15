@@ -253,9 +253,6 @@ class PusherGridEnv(gym.Env):
         for i, action in enumerate(action):
             self.game.step_agent(i, action)
 
-        positions = [a.position for a in self.game.agents]
-        print(f"agent positions {positions}")
-
         obs = []
         reward = []
         for a in self.game.agents:
@@ -303,7 +300,6 @@ class PusherGridEnv(gym.Env):
         # Observations are dictionaries containing:
         # - an image (partially observable view of the environment)
         # - the agent's direction/orientation (acting as a compass)
-        # - a textual mission string (instructions for the agent)
         obs = {
             'image': image,
             'direction': agent.direction,
@@ -345,7 +341,7 @@ class PusherGridEnv(gym.Env):
         r.setColor(255, 0, 0)
         r.drawPolygon([
             (-12, 10),
-            (12,  0),
+            (12, 0),
             (-12, -10)
         ])
         r.pop()
@@ -406,7 +402,7 @@ class PusherGridEnv(gym.Env):
             # of the agent's view area
             f_vec = a.dir_vec
             r_vec = a.right_vec
-            top_left = a.position + f_vec * (self.agent_view_size-1) - r_vec * (self.agent_view_size // 2)
+            top_left = a.position + f_vec * (self.agent_view_size - 1) - r_vec * (self.agent_view_size // 2)
 
             # For each cell in the visibility mask
             if highlight:

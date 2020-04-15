@@ -1,6 +1,6 @@
 import numpy as np
 
-from gym_minigrid.minigrid import OBJECT_TO_IDX, Box, Grid
+from gym_minigrid.minigrid import OBJECT_TO_IDX
 from gym_minigrid.pushergrid import PusherGridEnv
 from gym_minigrid.pushergame import PusherGame
 from gym_minigrid.register import register
@@ -64,9 +64,11 @@ class Pusher8Block10Env20x20(PusherEnv):
     def __init__(self, **kwargs):
         super().__init__(n_agents=8, n_blocks=10, size=20, **kwargs)
 
+
 class Pusher8Block40Env20x20(PusherEnv):
     def __init__(self, **kwargs):
         super().__init__(n_agents=8, n_blocks=40, size=20, **kwargs)
+
 
 class Pusher8Block80Env20x20(PusherEnv):
     def __init__(self, **kwargs):
